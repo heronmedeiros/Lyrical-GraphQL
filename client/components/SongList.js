@@ -1,6 +1,5 @@
-// import { divide } from "lodash";
 import React, { Component } from "react";
-import gql from 'graphql-tag'
+
 import { graphql } from 'react-apollo';
 import { Link } from 'react-router';
 
@@ -8,27 +7,27 @@ import fetchSongs from '../queries/fetchSongs';
 import deleteSong from "../queries/deleteSong";
 
 class SongList extends Component {
-    onSongDelete(event, id) {
-        event.preventDefault();
-
+    onSongDelete(id) {
         this.props.mutate( {
             variables: {
                 id
             }
-            // },refetchQueries: [{ query: fetchSongs }]
         })
         .then( () => this.props.data.refetch() )
+        // .catch( (err) => console.log(err))
     }
 
     renderSongs() {
         return this.props.data.songs.map(({ id, title}) => {
             return  (
-                <li  key={ id } id={ id }className="collection-item">
-                    { title }
-                    { ` ${ id }` }
+                <li  key={ id } id={ id } className="collection-item">
+                    <Link to={`/songs/${id}`}>
+                        { `${title} ${ id }` }
+                    </Link>
+
                     <i
                         className="material-icons"
-                        onClick={ (event) => this.onSongDelete(event, id) }
+                        onClick={ () => this.onSongDelete(id) }
                     >
                         delete
                     </i>
@@ -58,6 +57,6 @@ class SongList extends Component {
     }
 }
 
-export default graphql(fetchSongs)(
-    graphql(deleteSong)(SongList)
+export default graphql(deleteSong)(
+    graphql(fetchSongs)(SongList)
 );
